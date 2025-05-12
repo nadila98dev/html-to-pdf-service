@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -25,9 +24,15 @@ func convertHandler(w http.ResponseWriter, r *http.Request) {
     os.Setenv("WKHTMLTOPDF_PATH", `C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe`)
     log.Println("WKHTMLTOPDF_PATH set to:", os.Getenv("WKHTMLTOPDF_PATH"))
 
-    htmlData, err := io.ReadAll(r.Body)
-    if err != nil {
-        handleError(w, "Error reading HTML:", "Error reading HTML", http.StatusBadRequest, err)
+    // Parse form data
+    if err := r.ParseForm(); err != nil {
+        handleError(w, "Error parsing form data:", "Invalid form data", http.StatusBadRequest, err)
+        return
+    }
+
+    htmlData := r.FormValue("htmlContent")
+    if htmlData == "" {
+        handleError(w, "Empty HTML content:", "No HTML content provided", http.StatusBadRequest, nil)
         return
     }
 
@@ -37,7 +42,7 @@ func convertHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    page := wkhtmltopdf.NewPageReader(bytes.NewReader(htmlData))
+    page := wkhtmltopdf.NewPageReader(bytes.NewReader([]byte(htmlData)))
     page.EnableLocalFileAccess.Set(true) // Allow access to local files
     pdfg.AddPage(page)
 
