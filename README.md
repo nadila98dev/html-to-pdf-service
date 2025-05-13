@@ -1,7 +1,5 @@
-how to set up wkhtmltopdf with a Go (Golang) application, including instructions for setting environment variables on both Windows and macOS:
 
-markdown
-Copy code
+
 # PDF Generation in Go using wkhtmltopdf
 
 This project uses `wkhtmltopdf` to generate PDFs from HTML content in a Go application. `wkhtmltopdf` is a command-line tool that renders HTML into PDF using WebKit.
@@ -106,5 +104,5 @@ Copy code
 
 ---
 
-Would you like this in a GitHub-style repo format or need it customized for a specific project structure?
+
 
