@@ -1,4 +1,4 @@
-Absolutely! Here's a step-by-step guide to setting up `wkhtmltopdf` for use with **Golang** on **Windows**:
+
 
 ---
 
@@ -116,4 +116,4 @@ Make sure `wkhtmltopdf.exe` is accessible via PATH — or set `pdfg.BinPath` man
 
 ---
 
-Would you like me to provide a version that loads HTML from a file or a web URL?
+
