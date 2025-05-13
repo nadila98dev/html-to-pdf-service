@@ -1,108 +1,119 @@
+Absolutely! Here's a step-by-step guide to setting up `wkhtmltopdf` for use with **Golang** on **Windows**:
 
+---
 
-# PDF Generation in Go using wkhtmltopdf
+## **Step-by-Step: Setup `wkhtmltopdf` with Golang on Windows**
 
-This project uses `wkhtmltopdf` to generate PDFs from HTML content in a Go application. `wkhtmltopdf` is a command-line tool that renders HTML into PDF using WebKit.
+### **1. Install `wkhtmltopdf` on Windows**
 
-## Prerequisites
+1. Go to the [official wkhtmltopdf download page](https://wkhtmltopdf.org/downloads.html).
+2. Download the **Windows 64-bit (MSVC)** version (recommended).
+3. Run the installer and follow the setup instructions.
+4. Make sure to **check the box** to add `wkhtmltopdf` to your system's **PATH** during installation.
 
-### 1. Install wkhtmltopdf
+   * If you forgot: manually add the install path to your system PATH, usually:
 
-#### macOS (Homebrew)
+     ```
+     C:\Program Files\wkhtmltopdf\bin
+     ```
+
+### **2. Verify Installation**
+
+Open Command Prompt and run:
+
 ```bash
-brew install wkhtmltopdf
-Windows
-Download the installer from the official site:
-https://wkhtmltopdf.org/downloads.html
+wkhtmltopdf --version
+```
 
-Choose the appropriate version for your system (usually the 64-bit one with the installer), and run the installer.
+You should see something like:
 
-Note: On Windows, install it to a path without spaces (e.g., C:\wkhtmltopdf) to avoid command line issues.
+```
+wkhtmltopdf 0.12.6 (with patched qt)
+```
 
-Setup Instructions
-Go Dependencies
-Install the Go wrapper for wkhtmltopdf:
+---
 
-bash
-Copy code
+### **3. Set Up Your Go Project**
+
+Create a new folder and initialize your Go module:
+
+```bash
+mkdir mypdfgen
+cd mypdfgen
+go mod init mypdfgen
+```
+
+### **4. Install a Go Wrapper for wkhtmltopdf**
+
+Install a wrapper like [`github.com/SebastiaanKlippert/go-wkhtmltopdf`](https://github.com/SebastiaanKlippert/go-wkhtmltopdf):
+
+```bash
 go get github.com/SebastiaanKlippert/go-wkhtmltopdf
-Import it in your Go file:
+```
 
-go
-Copy code
-import "github.com/SebastiaanKlippert/go-wkhtmltopdf"
-Environment Variable Configuration
-Your Go application needs to know where to find the wkhtmltopdf binary.
+---
 
-macOS/Linux
-If installed via Homebrew, it's usually in /usr/local/bin. You can confirm by running:
+### **5. Sample Go Code to Generate PDF**
 
-bash
-Copy code
-which wkhtmltopdf
-Set the path in your environment:
+Here’s a simple example:
 
-bash
-Copy code
-export WKHTMLTOPDF_PATH=/usr/local/bin/wkhtmltopdf
-You can add this line to your .bashrc, .zshrc, or .profile to make it permanent.
-
-Windows
-Find the path where wkhtmltopdf.exe is installed (e.g., C:\wkhtmltopdf\bin\wkhtmltopdf.exe).
-
-Set the environment variable in PowerShell or Command Prompt:
-
-powershell
-Copy code
-$env:WKHTMLTOPDF_PATH="C:\wkhtmltopdf\bin\wkhtmltopdf.exe"
-To make it permanent:
-
-Open System Properties > Environment Variables.
-
-Add a new user variable WKHTMLTOPDF_PATH with the full path to wkhtmltopdf.exe.
-
-Sample Usage
-go
-Copy code
+```go
 package main
 
 import (
     "log"
     "os"
 
-    wkhtml "github.com/SebastiaanKlippert/go-wkhtmltopdf"
+    pdf "github.com/SebastiaanKlippert/go-wkhtmltopdf"
 )
 
 func main() {
-    pdfg, err := wkhtml.NewPDFGenerator()
+    // Create new PDF generator
+    pdfg, err := pdf.NewPDFGenerator()
     if err != nil {
         log.Fatal(err)
     }
 
-    page := wkhtml.NewPageReader(strings.NewReader("<html><body><h1>Hello PDF</h1></body></html>"))
+    // Set global options
+    pdfg.Dpi.Set(300)
+    pdfg.Orientation.Set(pdf.OrientationPortrait)
+    pdfg.PageSize.Set(pdf.PageSizeA4)
+
+    // Create a new input page from HTML string
+    page := pdf.NewPageReader(os.Stdin)
+    page.Input = "<h1>Hello from Golang</h1>"
     pdfg.AddPage(page)
 
+    // Create the PDF
     err = pdfg.Create()
     if err != nil {
         log.Fatal(err)
     }
 
-    err = pdfg.WriteFile("output.pdf")
+    // Write PDF to file
+    err = pdfg.WriteFile("./output.pdf")
     if err != nil {
         log.Fatal(err)
     }
 
-    log.Println("PDF created successfully!")
+    log.Println("PDF created successfully.")
 }
-Notes
-Make sure the binary is accessible and executable.
+```
 
-If you deploy to other environments (e.g., Docker), install wkhtmltopdf in the image and set the correct path.
-
-yaml
-Copy code
+You can replace `page.Input` with `pdf.NewPage("https://example.com")` if you want to generate a PDF from a URL.
 
 ---
 
+### **6. Run the Program**
 
+Run it from terminal:
 
+```bash
+go run main.go
+```
+
+Make sure `wkhtmltopdf.exe` is accessible via PATH — or set `pdfg.BinPath` manually to the executable.
+
+---
+
+Would you like me to provide a version that loads HTML from a file or a web URL?
